@@ -58,6 +58,32 @@ app.get('/populate', function (req, res) {
     })
 })
 
+app.get('/suv/:size/:offset', function (req, res) {
+    var results = []
+    client.search({
+        index: 'voitures',
+        type: 'voiture',
+        body: {
+            query: {
+                match_all: {},
+            },
+            sort: {
+                "volume.keyword": {
+                    order: "desc"
+                }
+            }
+        }
+    }).then(res => {
+        res.hits.hits.forEach(model => {
+            results.push(model['_source']);
+        });
+    }, err => {
+        console.log(err.message);
+    }).then(() => {
+        res.json(results);
+    });
+})
+
 app.listen(6969, function () {
     console.log('Express server is listening on port 6969!')
 });
